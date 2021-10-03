@@ -8,7 +8,7 @@ namespace SQLiteAndDapper.Data
 {
   public class SqliteEmployeeRepository : SqliteBaseRepository, IEmployeeRepository
   {
-    public Employee GetEmployee(long id)
+    public Employee GetEmployee(int id)
     {
       if (!File.Exists(DbFile)) return null;
 
@@ -27,14 +27,14 @@ namespace SQLiteAndDapper.Data
     {
       if (!File.Exists(DbFile))
       {
-        //CreateDatabase();
+        CreateDatabase();
       }
 
       using (var cnn = CompanyDbConnection())
       {
         cnn.Open();
-        employee.Id = cnn.Query<long>(
-            @"INSERT INTO Customer 
+        employee.Id = cnn.Query<int>(
+            @"INSERT INTO Employee 
               ( FirstName, LastName, DateOfBirth ) VALUES 
               ( @FirstName, @LastName, @DateOfBirth );
               select last_insert_rowid()", employee).First();
@@ -46,14 +46,18 @@ namespace SQLiteAndDapper.Data
       using (var cnn = CompanyDbConnection())
       {
         cnn.Open();
-        cnn.Execute(
-            @"create table Employee
-                (
-                  Id           integer identity primary key AUTOINCREMENT,
-                  FirstName    varchar(100) not null,
-                  LastName     varchar(100) not null,
-                  DateOfBirth  datetime not null
-                )");
+
+        var createTableCmd = cnn.CreateCommand();
+        createTableCmd.CommandText = @"
+          create table Employee
+          (
+            Id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            FirstName    VARCHAR(100) NOT NULL,
+            LastName     VARCHAR(100) NOT NULL,
+            DateOfBirth  DATETIME NOT NULL
+          )";
+                
+        createTableCmd.ExecuteNonQuery();
       }
     }
   }

@@ -4,7 +4,7 @@ namespace SQLiteAndDapper.Data
 {
   public interface IEmployeeRepository
   {
-    Employee GetEmployee (long id);
+    Employee GetEmployee (int id);
     void SaveEmployee(Employee employee);    
   }
 }
